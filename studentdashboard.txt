@@ -1,0 +1,547 @@
+import 'dart:async';
+import 'dart:html' as html;
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+class DashboardScreen extends StatefulWidget {
+  final String enrollmentNumber; // Add this variable
+
+  DashboardScreen(
+      {required this.enrollmentNumber}); // Constructor to receive the enrollmentNumber
+
+  @override
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late String enrollmentNumber;
+  @override
+  void initState() {
+    super.initState();
+    enrollmentNumber = widget.enrollmentNumber;
+  }
+   
+
+  int _currentIndex = 0;
+
+  final  List<Widget> _pages = [
+    CreateProjectPage(enrollmentNumber: widget.enrollmentNumber),
+    ProgressPage(),
+    RemarksPage(),
+    LogoutPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: Text('Student Dashboard'), backgroundColor: Colors.black87),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text(
+                enrollmentNumber,
+                style: TextStyle(
+                  fontSize: 40, // Set the font size to 20
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Create Project'),
+              onTap: () {
+                _onItemTapped(0);
+                Navigator.pop(context);
+                
+              },
+            ),
+            ListTile(
+              title: Text('Progress'),
+              onTap: () {
+                _onItemTapped(1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Remarks'),
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: () {
+                _onItemTapped(3);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            backgroundColor: Colors.black87,
+            icon: Icon(Icons.business),
+            label: 'Create Project',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timeline),
+            label: 'Progress',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.comment),
+            label: 'Remarks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.exit_to_app),
+            label: 'Logout',
+          ),
+        ],
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// class CreateProjectPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//      return Center(
+//       child: Text('Create Project Page'),
+//     );
+//   }
+// }
+
+class CreateProjectPage extends StatefulWidget  {
+  final String enrollmentNumber;
+
+  CreateProjectPage({required this.enrollmentNumber});
+    
+  @override
+  _CreateProjectPageState createState() => _CreateProjectPageState(enrollmentNumber: enrollmentNumber);
+}
+
+class _CreateProjectPageState extends State<CreateProjectPage> {
+ final String enrollmentNumber;
+
+  _CreateProjectPageState({required this.enrollmentNumber});
+  String ProjectFacultyname = '';
+  String dropdownValue = 'CP-1';
+  String projectTitle = '';
+  String projectDescription = '';
+  List<String> dropdownItems = ['CP-1', 'CP-2', 'CP-3'];
+  void _resetState() {
+    setState(() {
+      ProjectFacultyname = '';
+      dropdownValue = 'CP-1';
+      projectTitle = '';
+      projectDescription = '';
+    });
+  }
+  // Add this line to store the enrollment number
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   widget.enrollmentNumber; // Initialize the enrollment number
+  // }
+
+//   void _saveData() {
+//     if (ProjectFacultyname.isNotEmpty && projectTitle.isNotEmpty) {
+//       // Access Firestore instance
+//       FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+//       // Define a collection reference
+//       // CollectionReference projects = firestore.collection('projects');
+//       DocumentReference studentDocument = firestore
+//           .collection('Project Info')
+//           .doc('20012011187')
+//           .collection('User Project')
+//           .doc('Project');
+// //CollectionReference projects = studentDocument.collection('your_collection_name');
+//       // Add data to Firestore
+//       studentDocument
+//           .set({
+//             'facultyName': ProjectFacultyname,
+//             'dropdownValue': dropdownValue,
+//             'projectTitle': projectTitle,
+//             'projectDescription': projectDescription,
+//           })
+//           .then((_) {
+//             // Data added successfully
+//             print('Document ID');
+//             _resetState();
+//           } as FutureOr Function(void value))
+//           .catchError((e) {
+//             // Handle errors
+//             print('Error: $e');
+//           });
+//     }
+//   }
+void _saveData() {
+  if (ProjectFacultyname.isNotEmpty && projectTitle.isNotEmpty) {
+    // Access Firestore instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Define references to the student document and the user project
+    DocumentReference studentDocument = firestore.collection('Project Info').doc('20012011187');
+    CollectionReference userProjects = studentDocument.collection('User Project');
+
+    // Check if the user project document exists
+    userProjects.get().then((querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        // User has already submitted a project, display an error message
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('You have already submitted your project.'),
+      ));
+        print('You have already submitted your project.');
+      } else {
+        // User hasn't submitted a project, proceed with submission
+        studentDocument.collection('User Project').doc('Project').set({
+          'facultyName': ProjectFacultyname,
+          'dropdownValue': dropdownValue,
+          'projectTitle': projectTitle,
+          'projectDescription': projectDescription,
+        }).then((_) {
+          // Data added successfully
+          print('Document ID');
+          _resetState();
+        }).catchError((e) {
+          // Handle errors
+          print('Error: $e');
+        });
+      }
+    }).catchError((e) {
+      // Handle errors when checking if the document exists
+      print('Error: $e');
+    });
+  }
+}
+
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        width: screenWidth > 600 ? 600 : screenWidth * 0.9,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Short Name of your Faculty:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              TextField(
+                // Adjust the padding inside the text field
+                onChanged: (value) {
+                  setState(() {
+                    ProjectFacultyname = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Select a Value:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              SizedBox(height: 10),
+              DropdownButton<String>(
+                value: dropdownValue,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items:
+                    dropdownItems.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Project Title:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    projectTitle = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Project Description:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                height: 100, // Fixed height for the description field
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      projectDescription = value;
+                    });
+                  },
+                  maxLines: null, // Allow unlimited lines of text
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  _saveData();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.black87, // Background color
+                ),
+                child: Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProgressPage extends StatefulWidget {
+  @override
+  _ProgressPageState createState() => _ProgressPageState();
+}
+
+class _ProgressPageState extends State<ProgressPage> {
+  String description = '';
+  File? uploadedFile;
+  File? Filename;
+
+  void _pickFile() async {
+    final html.InputElement input = html.InputElement(type: 'file')
+      ..accept = '.pdf,.doc,.zip';
+    input.click();
+
+    input.onChange.listen((e) {
+      final fileList = input.files;
+      if (fileList != null && fileList.isNotEmpty) {
+        final file = fileList[0];
+        setState(() {
+          uploadedFile = File(file.relativePath!);
+          Filename = File(file.name);
+        });
+      }
+    });
+  }
+
+  void _saveData() {
+    if (description.isNotEmpty && uploadedFile != null) {
+      // Save the description and file here
+      print('Description: $description');
+      print('File Name: ${Filename}');
+
+      // Clear the form after saving
+      setState(() {
+        description = '';
+        uploadedFile = null;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Description:',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 10.0),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        description = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _pickFile,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                    ),
+                    child: Text('Upload File'),
+                  ),
+                  SizedBox(height: 20),
+                  if (uploadedFile != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Uploaded File:',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(height: 10),
+                        Text('File Name: ${Filename}'),
+                        SizedBox(height: 10),
+                        Text('Description: $description'),
+                      ],
+                    ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _saveData,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
+                    ),
+                    child: Text('Submit'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// class ProgressPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Text('Progress Page'),
+//     );
+//   }
+// }
+
+class RemarksPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('Remarks Page'),
+    );
+  }
+}
+
+class LogoutPage extends StatelessWidget {
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Navigate back to the login/signup page
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/auth', // Replace with the route name for your login/signup page
+        (route) => false,
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text('Logout Page'),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              _signOut(context);
+            },
+            child: Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// void main() {
+//   runApp(DashboardApp());
+// }
+
+// class DashboardApp extends StatelessWidget {
+
+// final String enrollmentNumber= ""; // Add this variable
+
+//   DashboardScreen({required this.enrollmentNumber});
+// // Constructor to receive the enrollmentNumber
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Dashboard',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       debugShowCheckedModeBanner: false,
+//       home: DashboardScreen(enrollmentNumber),
+//     );
+//   }
+// }
