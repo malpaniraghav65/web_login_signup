@@ -147,6 +147,7 @@ class AddFaculty extends StatefulWidget {
 
 class _AddFacultyState extends State<AddFaculty> {
   Uint8List? _csvData;
+  var Error  =  "";
 
   void _handleFileUpload(html.File file) async {
     final reader = html.FileReader();
@@ -206,6 +207,8 @@ class _AddFacultyState extends State<AddFaculty> {
         ));
       } catch (error) {
         print('Error during signup: $error');
+        Error = error.toString();
+        
       }
     }
   }
@@ -241,7 +244,7 @@ class _AddFacultyState extends State<AddFaculty> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Data Added',
+                    '$Error',
                     style: TextStyle(fontSize: 18),
                   ),
                 ],
@@ -252,17 +255,6 @@ class _AddFacultyState extends State<AddFaculty> {
     );
   }
 }
-
-// class AllProjects extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text('All Projects Page'),
-//     );
-//   }
-// }
-//import 'package:flutter/material.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AllProjects extends StatefulWidget {
   @override
@@ -388,9 +380,13 @@ class _AllProjectsState extends State<AllProjects> {
                           children: [
                             // Use subcollectionData to display the data from the subcollection
                             Text(
-                                'Field 1: ${subcollectionData[0]['cp']}'), // Replace 'field1' with the actual field name
+                                'cp: ${subcollectionData[0]['cp']}'), // Replace 'field1' with the actual field name
                             Text(
-                                'Field 2: ${subcollectionData[0]['Guide Name']}'), // Replace 'field2' with the actual field name
+                                'Guide Name: ${subcollectionData[0]['Guide Name']}'), // Replace 'field2' with the actual field name
+                                  Text(
+                                'title: ${subcollectionData[0]['title']}'), 
+                            Text(
+                                'Description: ${subcollectionData[0]['Description']}'), // Replace 'field4' with the actual field name
                             // Add more fields as needed
                           ],
                         ),
@@ -402,10 +398,6 @@ class _AllProjectsState extends State<AllProjects> {
                   }
                 },
               );
-
-
-
-
                     // Display project details here
                   },
                 ),
@@ -417,92 +409,6 @@ class _AllProjectsState extends State<AllProjects> {
     );
   }
 }
-
-
-
-// class SetSemester extends StatefulWidget {
-//   @override
-//   _SetSemesterState createState() => _SetSemesterState();
-// }
-
-// class _SetSemesterState extends State<SetSemester> {
-//   String _selectedSemester = '';
-//   final List<String> semesterOptions = ['ODD', 'EVEN'];
-
-//   void _submitSemester() async {
-//   if (_selectedSemester.isNotEmpty) {
-//     try {
-//       // Assuming the administrator's email is used as a unique identifier
-//      // String adminEmail = FirebaseAuth.instance.currentUser!.email!;
-
-//       // Update the 'semester' field in the existing 'admin' document
-//       await FirebaseFirestore.instance.collection('Admin').doc('Admin').update({
-//         'semester': _selectedSemester,
-//       });
-
-//       // Display a success message
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('Semester Updated Successfully.'),
-//         ),
-//       );
-
-//       // Clear the form after submission
-//       setState(() {
-//         _selectedSemester = '';
-//       });
-//     } catch (error) {
-//       print('Error updating semester: $error');
-//       // Handle error updating semester
-//     }
-//   }
-// }
-
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Padding(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: <Widget>[
-//               Text(
-//                 'Select Semester:',
-//                 style: TextStyle(fontSize: 18),
-//               ),
-//               SizedBox(height: 10),
-//               DropdownButton<String>(
-//                 value: _selectedSemester.isEmpty ? null : _selectedSemester,
-//                 onChanged: (value) {
-//                   setState(() {
-//                     _selectedSemester = value!;
-//                   });
-//                 },
-//                 items: semesterOptions.map((String semester) {
-//                   return DropdownMenuItem<String>(
-//                     value: semester,
-//                     child: Text(semester),
-//                   );
-//                 }).toList(),
-//               ),
-//               SizedBox(height: 20),
-//               ElevatedButton(
-//                 onPressed: _submitSemester,
-//                 style: ElevatedButton.styleFrom(
-//                   primary: Colors.green,
-//                 ),
-//                 child: Text('Submit'),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-//import 'package:flutter/material.dart';
 
 class SetSemester extends StatefulWidget {
   @override

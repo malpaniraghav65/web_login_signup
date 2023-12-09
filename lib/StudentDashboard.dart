@@ -242,15 +242,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     }
   }
 
-  // void _saveData() {
-  //   if (ProjectFacultyname.isNotEmpty && projectTitle.isNotEmpty) {
-  //     FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  //     .catchError((e) {
-  //       print('Error: $e');
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -373,114 +364,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   }
 }
 
-// class ProgressPage extends StatefulWidget {
-//   @override
-//   _ProgressPageState createState() => _ProgressPageState();
-// }
 
-// class _ProgressPageState extends State<ProgressPage> {
-//   String description = '';
-//   File? uploadedFile;
-//   File? Filename;
-
-//   void _pickFile() async {
-//     final html.InputElement input = html.InputElement(type: 'file')
-//       ..accept = '.pdf,.doc,.zip';
-//     input.click();
-
-//     input.onChange.listen((e) {
-//       final fileList = input.files;
-//       if (fileList != null && fileList.isNotEmpty) {
-//         final file = fileList[0];
-//         setState(() {
-//           uploadedFile = File(file.relativePath!);
-//           Filename = File(file.name);
-//         });
-//       }
-//     });
-//   }
-
-//   void _saveData() {
-//     if (description.isNotEmpty && uploadedFile != null) {
-//       print('Description: $description');
-//       print('File Name: ${Filename}');
-
-//       setState(() {
-//         description = '';
-//         uploadedFile = null;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: <Widget>[
-//             Padding(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.center,
-//                 children: <Widget>[
-//                   Text(
-//                     'Description:',
-//                     style: TextStyle(fontSize: 18),
-//                   ),
-//                   SizedBox(height: 10.0),
-//                   TextField(
-//                     onChanged: (value) {
-//                       setState(() {
-//                         description = value;
-//                       });
-//                     },
-//                     decoration: InputDecoration(
-//                       border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.circular(10.0),
-//                       ),
-//                     ),
-//                   ),
-//                   SizedBox(height: 20),
-//                   ElevatedButton(
-//                     onPressed: _pickFile,
-//                     style: ElevatedButton.styleFrom(
-//                       primary: Colors.blue,
-//                     ),
-//                     child: Text('Upload File'),
-//                   ),
-//                   SizedBox(height: 20),
-//                   if (uploadedFile != null)
-//                     Column(
-//                       crossAxisAlignment: CrossAxisAlignment.center,
-//                       children: [
-//                         Text(
-//                           'Uploaded File:',
-//                           style: TextStyle(fontSize: 18),
-//                         ),
-//                         SizedBox(height: 10),
-//                         Text('File Name: ${Filename}'),
-//                         SizedBox(height: 10),
-//                         Text('Description: $description'),
-//                       ],
-//                     ),
-//                   SizedBox(height: 20),
-//                   ElevatedButton(
-//                     onPressed: _saveData,
-//                     style: ElevatedButton.styleFrom(
-//                       primary: Colors.green,
-//                     ),
-//                     child: Text('Submit'),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class ProgressPage extends StatefulWidget {
   final String enrollmentNumber;
@@ -668,14 +552,6 @@ class _ProgressPageState extends State<ProgressPage> {
   }
 }
 
-// class RemarksPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text('Remarks Page'),
-//     );
-//   }
-// }
 
 class RemarksPage extends StatefulWidget {
   final String enrollmentNumber;
@@ -721,11 +597,6 @@ class _RemarksPageState extends State<RemarksPage> {
 
   _RemarksPageState({required this.enrollmentNumber});
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchMilestones();
-  // }
 
   Future<void> fetchMilestones() async {
     final querySnapshot = await FirebaseFirestore.instance
@@ -835,54 +706,3 @@ class LogoutPage extends StatelessWidget {
     );
   }
 }
-
-// void main() {
-//   runApp(DashboardApp());
-// }
-
-// class DashboardApp extends StatelessWidget {
-//   final String enrollmentNumber;
-
-//   DashboardApp({required this.enrollmentNumber});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Dashboard',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       debugShowCheckedModeBanner: false,
-//       home: DashboardScreen(enrollmentNumber: enrollmentNumber),
-//     );
-//   }
-// }
-// DocumentReference studentDocument =
-//           firestore.collection('Project Info').doc(enrollmentNumber);
-
-//       studentDocument.collection('User Project').doc('Project').set({
-//         'facultyName': ProjectFacultyname,
-//         'dropdownValue': dropdownValue,
-//         'projectTitle': projectTitle,
-//         'projectDescription': projectDescription,
-//       }).then((_) {
-//         print('Document ID');
-//         _resetState();
-//       })
-
-
-//  var userData = querySnapshot.data();
-
-//     // Check if the specific fields you want to validate are empty
-//     //var userData = querySnapshot.data();
-// String? facultyName = userData?['facultyName'] as String?;
-// String? dropdownValue = userData?['dropdownValue'] as String?;
-// String? projectTitle = userData?['projectTitle'] as String?;
-// String? projectDescription = userData?['projectDescription'] as String?;
-
-//         // User has already submitted a project, display an error message
-//         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-//         content: Text('You have already submitted your project.'),
-//       ));
-//         print('You have already submitted your project.');
-//       } 

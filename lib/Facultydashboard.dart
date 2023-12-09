@@ -1,31 +1,12 @@
 import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:web_login_signup/Milestone.dart';
 import 'main.dart';
-
-// void main() {
-//   runApp(FacultyDashboardApp());
-// }
-
-// class FacultyDashboardApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Dashboard',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       debugShowCheckedModeBanner: false,
-//       home: FacultyDashboardScreen(),
-//     );
-//   }
-// }
 
 class FacultyDashboardScreen extends StatefulWidget {
   @override
@@ -270,9 +251,13 @@ class _AllStudentsState extends State<AllStudents> {
                           children: [
                             // Use subcollectionData to display the data from the subcollection
                             Text(
-                                'Field 1: ${subcollectionData[0]['cp']}'), // Replace 'field1' with the actual field name
+                                'cp: ${subcollectionData[0]['cp']}'), // Replace 'field1' with the actual field name
                             Text(
-                                'Field 2: ${subcollectionData[0]['Guide Name']}'), // Replace 'field2' with the actual field name
+                                'Guide: ${subcollectionData[0]['Guide Name']}'),
+                            Text(
+                                'title: ${subcollectionData[0]['title']}'), 
+                            Text(
+                                'Description: ${subcollectionData[0]['Description']}'),
                             // Add more fields as needed
                           ],
                         ),
@@ -434,150 +419,6 @@ class AddStudents extends StatefulWidget {
   _AddStudentsState createState() => _AddStudentsState();
 }
 
-// class _AddStudentsState extends State<AddStudents> {
-//   Uint8List? _csvData;
-
-//   void _handleFileUpload(html.File file) async {
-//     final reader = html.FileReader();
-//     reader.onLoadEnd.listen((event) {
-//       final data = reader.result as Uint8List;
-//       setState(() {
-//         _csvData = data;
-//       });
-
-//       // Parse the CSV data and store it in Firebase Firestore
-//       _parseAndStoreData(data);
-//     });
-//     reader.readAsArrayBuffer(file);
-//   }
-
-//   Future<void> _parseAndStoreData(Uint8List data) async {
-//    // FirebaseFirestore firestore = FirebaseFirestore.instance;
-//     final decodedData = utf8.decode(data);
-//     final List<List<dynamic>> csvTable =
-//         CsvToListConverter().convert(decodedData);
-
-//     for (final row in csvTable) {
-    
-//       try {
-//           final StudentData = {
-//         'email': row[0], // Replace with your CSV column names
-//         'enrollmentNumber': row[1].toString(),
-//         'password': row[2].toString(),
-//         'phone number': row[3].toString(),
-//         'type': "student",
-//         // Add more fields as needed
-//       };
-//         UserCredential userCredential =
-//             await FirebaseAuth.instance.createUserWithEmailAndPassword(
-//           email: StudentData['email'],
-//           password: StudentData['password'],
-//         );
-
-//         User user = userCredential.user!;
-
-//         if (!user.emailVerified) {
-//           await user.sendEmailVerification();
-//         }
-//         await FirebaseFirestore.instance
-//             .collection('Student').doc('year').collection('2023').doc('Semester').collection('ODD')
-//             .doc(StudentData['email'])
-//             .set({
-//           'enrollmentNumber': StudentData['enrollmentNumber'],
-//           'phoneNumber': StudentData['phone number'],
-//           'email': StudentData['email'],
-//           'password': StudentData['password'],
-//           'type': "student",
-//           // Add more fields as needed
-//         });
-//             // Create a document reference for 'Project Info' with the user's enrollment number as the document ID
-//       DocumentReference projectInfoRef = FirebaseFirestore.instance
-//           .collection('Project Info')
-//           .doc(StudentData['enrollmentNumber']);
-//       // Set data in the 'Project Info' document
-//       await projectInfoRef.set({
-//         'enrollmentNumber': StudentData['enrollmentNumber'],
-//       });
-
-//       // Create a collection named 'User Project' under the 'Project Info' document
-//       await projectInfoRef.collection('User Project').doc('Project').set({
-//         'Description': "",
-//         'Guide Name': "",
-//         'title': "",
-//         'cp': "",
-//       });
-
-//       // Create 'Milestone' collection with the user's enrollment number as the document ID
-//       DocumentReference milestoneRef = FirebaseFirestore.instance
-//           .collection('Milestone')
-//           .doc(StudentData['enrollmentNumber']);
-
-//       // Set data in the 'Milestone' document
-//       await milestoneRef.set({
-//         'enrollmentNumber': StudentData['enrollmentNumber'],
-//       });
-
-//       // Create 'All Milestones' collection under the 'Milestone' document
-//       await milestoneRef.collection('All Milestones');
-//              // Print CSV data to the console
-//           print(
-//           'Email: ${StudentData['email']}, Password: ${StudentData['password']}');
-//         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-//           content: Text('Verification email sent. Please verify your email.'),
-//         ));
-//       } catch (error) {
-//         print('Error during signup: $error');
-//         // Handle signup error
-//       }
-
- 
-    
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: <Widget>[
-//             ElevatedButton(
-//               onPressed: () {
-//                 final html.InputElement input = html.InputElement(type: 'file')
-//                   ..accept = '.csv';
-//                 input.click();
-
-//                 input.onChange.listen((e) {
-//                   final fileList = input.files;
-//                   if (fileList != null && fileList.isNotEmpty) {
-//                     final file = fileList[0];
-//                     _handleFileUpload(file);
-//                   }
-//                 });
-//               },
-//               style: ElevatedButton.styleFrom(
-//                 primary: Colors.blue,
-//               ),
-//               child: Text('Upload CSV File'),
-//             ),
-//             if (_csvData != null)
-//               Column(
-//                 crossAxisAlignment: CrossAxisAlignment.center,
-//                 children: [
-//                   Text(
-//                     'Data Added',
-//                     style: TextStyle(fontSize: 18),
-//                   ), // Display the CSV data here
-//                 ],
-//               ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class _AddStudentsState extends State<AddStudents> {
   String Semester = 'ODD'; // Default value
    String year = '2023';
@@ -689,14 +530,6 @@ class _AddStudentsState extends State<AddStudents> {
           'title': "",
           'cp': "",
         });
-
-        // // Create a collection named 'User Project' under the 'Project Info' document
-        // await projectInfoRef.collection('User Project').doc('Project').set({
-        //   'Description': "",
-        //   'Guide Name': "",
-        //   'title': "",
-        //   'cp': "",
-        // });
 
         // Create 'Milestone' collection with the user's enrollment number as the document ID
         DocumentReference milestoneRef = FirebaseFirestore.instance

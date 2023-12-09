@@ -33,11 +33,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized;
   await Firebase.initializeApp(
       options: const FirebaseOptions(
-          apiKey: "AIzaSyBDWL38k4MNXh2lRPCwFkiv7553JC7IkSE",
-          appId: "1:281447264335:web:98b35028970d31b806ba3a",
-          messagingSenderId: "281447264335",
-          projectId: "cpiii-2408",
-          storageBucket: "cpiii-2408.appspot.com",));
+    apiKey: "AIzaSyBDWL38k4MNXh2lRPCwFkiv7553JC7IkSE",
+    appId: "1:281447264335:web:98b35028970d31b806ba3a",
+    messagingSenderId: "281447264335",
+    projectId: "cpiii-2408",
+    storageBucket: "cpiii-2408.appspot.com",
+  ));
   runApp(MyApp());
 }
 
@@ -127,8 +128,6 @@ class _AuthScreenState extends State<AuthScreen> {
 }
 
 class LoginForm extends StatelessWidget {
-
-  
   final VoidCallback toggleAuthMode;
   TextEditingController _loginemail = TextEditingController();
   TextEditingController _loginpassword = TextEditingController();
@@ -138,7 +137,6 @@ class LoginForm extends StatelessWidget {
 
   Future<void> _login(
       BuildContext context, String email, String password) async {
-        
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -151,13 +149,13 @@ class LoginForm extends StatelessWidget {
       if (user.emailVerified) {
         // Fetch user data from Firestore and perform further actions
         DocumentSnapshot userData = await FirebaseFirestore.instance
-        .collection('Student')
-        .doc('year')
-        .collection('2023')
-        .doc('Semester')
-        .collection('ODD')
-        .doc(email) // You might need to store the user's UID during signup
-        .get();
+            .collection('Student')
+            .doc('year')
+            .collection('2023')
+            .doc('Semester')
+            .collection('ODD')
+            .doc(email) // You might need to store the user's UID during signup
+            .get();
 
         if (userData.exists) {
           String type = userData['type'];
@@ -171,28 +169,6 @@ class LoginForm extends StatelessWidget {
                       DashboardScreen(enrollmentNumber: enrollmentNumber),
                 ));
           }
-          // } else if (type == 'faculty') {
-          //   Navigator.pushReplacement(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => FacultyDashboardScreen(),
-          //       ));
-          // else if (type == 'admin') {
-          //   Navigator.pushReplacement(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => AdminDashboardScreen(),
-          //       ));
-          // }
-          //  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          //   content: Text('User data found.'),
-          // Navigate to the dashboard screen
-          //  Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => ProviderScreen()),
-          // );
-          // Data is available in the Firestore
-          // You can navigate to the next screen or perform any actions
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('User data not found. '),
@@ -226,104 +202,107 @@ class LoginForm extends StatelessWidget {
     }
   }
 
-  Future<void> _loginAsFaculty(BuildContext context, String email, String password) async {
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+  Future<void> _loginAsFaculty(
+      BuildContext context, String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    User user = userCredential.user!;
+      User user = userCredential.user!;
 
-    if (user.emailVerified) {
-      // Fetch user data from Firestore and perform further actions
-      DocumentSnapshot userData = await FirebaseFirestore.instance
-          .collection('Faculty')
-          .doc(email) // You might need to store the user's UID during signup
-          .get();
+      if (user.emailVerified) {
+        // Fetch user data from Firestore and perform further actions
+        DocumentSnapshot userData = await FirebaseFirestore.instance
+            .collection('Faculty')
+            .doc(email) // You might need to store the user's UID during signup
+            .get();
 
-      if (userData.exists) {
-        String type = userData['type'];
-        if (type == 'faculty') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FacultyDashboardScreen(),
-            ),
-          );
+        if (userData.exists) {
+          String type = userData['type'];
+          if (type == 'faculty') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FacultyDashboardScreen(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Invalid user type.'),
+            ));
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Invalid user type.'),
+            content: Text('User data not found.'),
           ));
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('User data not found.'),
+          content: Text('Please verify your email before logging in.'),
         ));
       }
-    } else {
+    } catch (error) {
+      print('Error during login: $error');
+      // Handle login error
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please verify your email before logging in.'),
+        content: Text('Invalid email or password.'),
       ));
     }
-  } catch (error) {
-    print('Error during login: $error');
-    // Handle login error
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Invalid email or password.'),
-    ));
   }
-}
-Future<void> _loginAsAdmin(BuildContext context, String email, String password) async {
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
 
-    User user = userCredential.user!;
+  Future<void> _loginAsAdmin(
+      BuildContext context, String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    if (user.emailVerified) {
-      // Fetch user data from Firestore and perform further actions
-      DocumentSnapshot userData = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(email) // You might need to store the user's UID during signup
-          .get();
+      User user = userCredential.user!;
 
-      if (userData.exists) {
-        String type = userData['type'];
-        if (type == 'admin') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AdminDashboardScreen(),
-            ),
-          );
+      if (user.emailVerified) {
+        // Fetch user data from Firestore and perform further actions
+        DocumentSnapshot userData = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email) // You might need to store the user's UID during signup
+            .get();
+
+        if (userData.exists) {
+          String type = userData['type'];
+          if (type == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminDashboardScreen(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Invalid user type.'),
+            ));
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Invalid user type.'),
+            content: Text('User data not found.'),
           ));
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('User data not found.'),
+          content: Text('Please verify your email before logging in.'),
         ));
       }
-    } else {
+    } catch (error) {
+      print('Error during login: $error');
+      // Handle login error
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please verify your email before logging in.'),
+        content: Text('Invalid email or password.'),
       ));
     }
-  } catch (error) {
-    print('Error during login: $error');
-    // Handle login error
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Invalid email or password.'),
-    ));
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -399,14 +378,14 @@ Future<void> _loginAsAdmin(BuildContext context, String email, String password) 
               onPressed: () {
                 // Add logic for faculty login
                 //print('Login as Faculty');
-                 _loginAsFaculty(context, _loginemail.text, _loginpassword.text);
+                _loginAsFaculty(context, _loginemail.text, _loginpassword.text);
               },
               child: const Text('Login as Faculty'),
             ),
             TextButton(
               onPressed: () {
                 // Add logic for admin login
-                 _loginAsAdmin(context, _loginemail.text, _loginpassword.text);
+                _loginAsAdmin(context, _loginemail.text, _loginpassword.text);
                 print('Login as Admin');
               },
               child: const Text('Login as Admin'),
@@ -569,80 +548,3 @@ class SignupForm extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-// class AllStudents extends StatefulWidget {
-//   @override
-//   _AllStudentsState createState() => _AllStudentsState();
-// }
-
-// class _AllStudentsState extends State<AllStudents> {
-//   // Define a list to store student data
-//   List<DocumentSnapshot> studentsData = [];
-
-//   // Fetch data from Firebase Firestore
-//   void fetchStudentsData() async {
-//     final QuerySnapshot snapshot =
-//         await FirebaseFirestore.instance.collection('Project Info').doc('1234567890').collection('User Project').get();
-//     setState(() {
-//       studentsData = snapshot.docs;
-//     });
-//   }
-
-//   // Delete a student record from Firebase Firestore
-//   void deleteStudent() async {
-//     await FirebaseFirestore.instance
-//         .collection('Project Info')
-//         .doc('1234567890')
-//         .collection('User Project')
-//         .doc('Project')
-//         .set({
-//             'facultyName': '',
-//             'dropdownValue': 'CP-1',
-//             'projectTitle': '',
-//             'projectDescription': '',
-//           });
-//     // After deleting, refresh the list by fetching data again
-//     fetchStudentsData();
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Fetch data when the widget is initialized
-//     fetchStudentsData();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('All Students'),
-//       ),
-//       body: ListView.builder(
-//         itemCount: studentsData.length,
-//         itemBuilder: (context, index) {
-//           final student = studentsData[index];
-//           return ListTile(
-//             title: Text('1234567890'), // Replace with your data fields
-//             subtitle: Text(student['projectTitle']), // Replace with your data fields
-//             trailing: IconButton(
-//               icon: Icon(Icons.delete),
-//               onPressed: () {
-//                 // Delete the student data when the delete button is pressed
-//                 deleteStudent();
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
